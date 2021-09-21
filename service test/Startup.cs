@@ -38,6 +38,12 @@ namespace service_test
             services.AddSwaggerGen();
             services.AddControllers();
             services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(cS).UseLazyLoadingProxies());
+            
+            //services.AddCors(options =>
+            //{
+            //    options.AddPolicy("AllowAllOrigins",
+            //        b => { b.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod(); });
+            //});
             services.AddIdentity<User, IdentityRole>(option =>
             {
                 option.Password.RequireDigit = false;
@@ -54,23 +60,23 @@ namespace service_test
                 opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 opt.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-               .AddJwtBearer(cfg =>
-               {
-                   cfg.SaveToken = true;
-                   cfg.RequireHttpsMetadata = false;
-  
-                   cfg.TokenValidationParameters = new TokenValidationParameters()
-                   {
-                       ValidateIssuer = true,
-                       ValidIssuer = Configuration["JWT:ValidIssuer"],
-                       ValidateAudience = true,
-                       ValidAudience = Configuration["JWT:ValidAudience"],
-                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
-                   };
-               });
-            
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.SaveToken = true;
+                    cfg.RequireHttpsMetadata = false;
 
-            
+                    cfg.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = Configuration["JWT:ValidIssuer"],
+                        ValidateAudience = true,
+                        ValidAudience = Configuration["JWT:ValidateAudience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
+                    };
+                });
+
+
+
 
         }
 
@@ -83,7 +89,7 @@ namespace service_test
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "service_test v1"));
             }
-            
+            app.UseCors("AllowAllOrigins");
             app.UseHttpsRedirection();
 
             app.UseRouting();
